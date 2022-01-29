@@ -1,3 +1,7 @@
+![Preview of the site](preview.png "Preview")
+
+Check out on [the site](https://useless-website.vercel.app/) deployed on Vercel!
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
