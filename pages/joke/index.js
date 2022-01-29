@@ -6,7 +6,7 @@ import Head from "next/head";
 import useMounted from "../../hooks/useMounted";
 
 export default function Joke({ joke, category }) {
-  const darkMode = useDarkMode(false, {
+  const darkMode = useDarkMode(true, {
     classNameDark: "dark",
     classNameLight: "light",
   });

@@ -11,7 +11,7 @@ import OvalButton from "../components/OvalButton";
 import useMounted from "../hooks/useMounted";
 
 export default function Home() {
-  const darkMode = useDarkMode(false, {
+  const darkMode = useDarkMode(true, {
     classNameDark: "dark",
     classNameLight: "light",
   });
