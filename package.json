@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-blog",
+  "name": "useless-website",
   "private": true,
   "scripts": {
     "dev": "next dev",
