@@ -1,23 +1,16 @@
-import path from "path";
+import { supabase } from "../../../../utils/supabaseClient";
 import { getWord, WORD_LENGTH } from "../get_word";
-const fs = require("fs").promises;
 
 async function checkExistence(word, validWord) {
   console.log("validWord", validWord);
   if (word === validWord) return true;
 
-  const fileDir = "data/dictionary.json";
-  const dir = path.resolve("./public", fileDir);
+  const { data, error } = await supabase
+    .from("dict")
+    .select()
+    .textSearch("fts", word);
 
-  const data = await fs.readFile(dir, "utf-8");
-  const jsonObj = JSON.parse(data);
-
-  return word in jsonObj;
-
-  // const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-  // const data = await res.json();
-
-  // return typeof data.length !== "undefined";
+  return data.length > 0;
 }
 
 function checkCorrectness(word, validWord) {

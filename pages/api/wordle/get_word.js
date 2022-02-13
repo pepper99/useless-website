@@ -1,8 +1,6 @@
 import { supabase } from "../../../utils/supabaseClient";
 import path from "path";
 
-const fs = require("fs").promises;
-
 export const WORD_LENGTH = 6;
 
 export async function getWord() {
