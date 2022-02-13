@@ -191,7 +191,7 @@ function Wordle() {
       round: round,
     });
     localStorage.setItem("pepper-wordle", newState);
-    if (win) {
+    if (win || round > MAX_TRY) {
       const res = await fetch("/api/wordle/get_word");
       const data = await res.json();
       console.log(data);
@@ -312,7 +312,7 @@ function Wordle() {
             </div>
           </div>
           <Modal
-            condition={win}
+            condition={win || round > MAX_TRY}
             initial={true}
             title="Result"
             showCloseBtn={false}
