@@ -1,5 +1,4 @@
 import { supabase } from "../../../utils/supabaseClient";
-import path from "path";
 
 export const WORD_LENGTH = 6;
 
@@ -26,14 +25,11 @@ function getRandomInt(min, max) {
 }
 
 async function getRandomWord() {
-  const fileDir = "data/dictionary.json";
-  const dir = path.resolve("./public", fileDir);
-
-  const data = await fs.readFile(dir, "utf-8");
-  const jsonObj = JSON.parse(data);
-  var keyArray = Object.keys(jsonObj);
-  const key = keyArray[getRandomInt(0, keyArray.length - 1)];
-  return { word: key, definition: jsonObj[key] };
+  const { data, error } = await supabase
+    .from("dict")
+    .select("word,definition")
+  const row = data[getRandomInt(0, data.length - 1)];
+  return row;
 }
 
 export default async function handler(req, res) {
@@ -53,7 +49,6 @@ export default async function handler(req, res) {
       });
     } else {
       const { word, definition } = await getRandomWord();
-
       const { data, error } = await supabase.from("words").insert({
         word: word,
         definition: definition,
