@@ -24,7 +24,7 @@ function Layout({ children, backButton }) {
         {children}
         {mounted && (
           <OvalButton
-            className="absolute bottom-[5%] right-[5%]"
+            className="absolute sm:bottom-[5%] sm:right-[5%] sm:top-auto sm:left-auto top-[10%] left-[5%]"
             onClick={darkMode.toggle}
           >
             <FontAwesomeIcon icon={darkMode.value ? faMoon : faSun} />
@@ -38,7 +38,7 @@ function Layout({ children, backButton }) {
             <FontAwesomeIcon icon={faArrowLeft} />
           </OvalButton>
         )}
-        <span className="text-xs dark:text-zinc-600 absolute bottom-1 select-none">
+        <span className="text-xs dark:text-zinc-600 absolute bottom-1 select-none -z-10">
           Yay
         </span>
       </div>
