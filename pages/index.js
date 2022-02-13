@@ -30,12 +30,17 @@ export default function Home() {
         <div className="flex flex-col items-center mt-4 mb-4 space-y-4">
           <Link href="/joke">
             <a className="rounded-full font-bold text-center text-md p-1 w-52 bg-pink-400 hover:bg-pink-600 hover:scale-110 shadow-lg shadow-pink-600/70 transition duration-200 text-white">
-              <FontAwesomeIcon icon={faSmileBeam} /> Jokes
+              <FontAwesomeIcon fixedWidth icon={faSmileBeam} /> Jokes
             </a>
           </Link>
           <Link href="/fact">
             <a className="rounded-full font-bold text-center text-md p-1 w-52 bg-pink-400 hover:bg-pink-600 hover:scale-110 shadow-lg shadow-pink-600/70 transition duration-200 text-white">
-              <FontAwesomeIcon icon={faBook} /> Useless Facts
+              <FontAwesomeIcon fixedWidth icon={faBook} /> Useless Facts
+            </a>
+          </Link>
+          <Link href="/wordle">
+            <a className="rounded-full font-bold text-center text-md p-1 w-52 bg-pink-400 hover:bg-pink-600 hover:scale-110 shadow-lg shadow-pink-600/70 transition duration-200 text-white">
+              <FontAwesomeIcon fixedWidth icon={faBook} /> Wordle Clone
             </a>
           </Link>
         </div>
