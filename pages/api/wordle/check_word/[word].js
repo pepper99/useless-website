@@ -1,10 +1,14 @@
+import path from "path";
 import { getWord, WORD_LENGTH } from "../get_word";
 const fs = require("fs").promises;
 
 async function checkExistence(word, validWord) {
   if (word === validWord) return true;
 
-  const data = await fs.readFile(`./data/dictionary.json`, "utf-8");
+  const fileDir = 'data/dictionary.json';
+  const dir = path.resolve('./public', fileDir);
+
+  const data = await fs.readFile(dir, "utf-8");
   const jsonObj = JSON.parse(data);
 
   return word in jsonObj;

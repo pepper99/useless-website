@@ -1,3 +1,5 @@
+import path from "path";
+
 const fs = require("fs").promises;
 
 export const words = [{ word: "WORDLE", definition: "A game of vocabulary." }];
@@ -18,7 +20,10 @@ function getRandomInt(min, max) {
 }
 
 async function getRandomWord() {
-  const data = await fs.readFile(`./data/dictionary.json`, "utf-8");
+  const fileDir = 'data/dictionary.json';
+  const dir = path.resolve('./public', fileDir);
+
+  const data = await fs.readFile(dir, "utf-8");
   const jsonObj = JSON.parse(data);
   var keyArray = Object.keys(jsonObj);
   const key = keyArray[getRandomInt(0, keyArray.length - 1)];
