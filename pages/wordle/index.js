@@ -282,7 +282,7 @@ function Wordle() {
                 <div key={idx} className="flex gap-x-1">
                   {idx === 2 && (
                     <button
-                      className="h-10 w-12 rounded-md bg-zinc-500 text-xs text-white sm:h-14 sm:w-16 sm:text-base"
+                      className="h-12 w-12 rounded-md bg-zinc-500 text-xs text-white sm:h-14 sm:w-16 sm:text-base"
                       onClick={() => enterPress()}
                     >
                       ENTER
@@ -293,7 +293,7 @@ function Wordle() {
                       key={char}
                       className={`${
                         BG_COLORS[keyState[char]]
-                      } h-10 w-8 rounded-md text-white sm:h-14 sm:w-10 sm:text-base`}
+                      } h-12 w-8 rounded-md text-white sm:h-14 sm:w-10 sm:text-base`}
                       onClick={() => alphaPress(char)}
                     >
                       {char}
@@ -301,7 +301,7 @@ function Wordle() {
                   ))}
                   {idx === 2 && (
                     <button
-                      className="h-10 w-12 rounded-md bg-zinc-500 text-white sm:h-14 sm:w-16 sm:text-base"
+                      className="h-12 w-12 rounded-md bg-zinc-500 text-white sm:h-14 sm:w-16 sm:text-base"
                       onClick={() => backspacePress()}
                     >
                       <FontAwesomeIcon fixedWidth icon={faBackspace} />
