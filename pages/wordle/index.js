@@ -33,9 +33,9 @@ function FilledRow({ history, isLast, scaleOut }) {
       {history.word.split("").map((char, idx) => (
         <div
           key={idx}
-          className={`box-border w-16 h-16 ${
+          className={`box-border h-14 w-14 sm:h-16 sm:w-16 ${
             BG_COLORS[history.status[idx]]
-          } text-center flex text-white justify-center items-center text-3xl font-bold select-none duration-200`}
+          } flex select-none items-center justify-center text-center text-3xl font-bold text-white duration-200`}
         >
           {char}
         </div>
@@ -50,7 +50,7 @@ function UnfilledRow({ trialCount }) {
       {[...Array(MAX_LENGTH)].map((e, i) => (
         <div
           key={i}
-          className="box-border border-2 w-16 h-16 dark:bg-zinc-900 bg-white border-zinc-600 text-center flex text-white justify-center items-center text-3xl font-bold select-none duration-200"
+          className="box-border flex h-14 w-14 select-none items-center justify-center border-2 border-zinc-600 bg-white text-center text-3xl font-bold text-white duration-200 dark:bg-zinc-900 sm:h-16 sm:w-16"
         ></div>
       ))}
     </div>
@@ -239,75 +239,77 @@ function Wordle() {
       </Head>
       {mounted && (
         <>
-          <div className="flex flex-col gap-y-1 transition-transform">
-            {wordHistory.map((hist, idx) => (
-              <FilledRow
-                key={idx}
-                history={hist}
-                isLast={idx === wordHistory.length - 1}
-                scaleOut={scaleOut}
-              />
-            ))}
+          <div className="m-auto flex flex-col justify-between items-center h-full min-h-fit w-fit">
+            <div className="my-auto w-fit flex flex-col gap-y-1 transition-transform">
+              {wordHistory.map((hist, idx) => (
+                <FilledRow
+                  key={idx}
+                  history={hist}
+                  isLast={idx === wordHistory.length - 1}
+                  scaleOut={scaleOut}
+                />
+              ))}
 
-            <div
-              className={`flex w-fit gap-x-1 duration-200 ${
-                shake ? "animate-shake" : "animate-none"
-              }`}
-            >
-              {trialCount <= MAX_TRY &&
-                currentWord
-                  .padEnd(MAX_LENGTH)
-                  .split("")
-                  .map((e, idx) => (
-                    <div
-                      key={idx}
-                      className={`box-border border-2 w-16 h-16 dark:bg-zinc-900 bg-white ${
-                        e !== " " ? "border-zinc-500" : "border-zinc-600"
-                      } text-center flex dark:text-white justify-center items-center text-3xl font-bold select-none ${
-                        keyIn && e !== " " && idx === currentWord.length - 1
-                          ? "scale-110"
-                          : "scale-100"
-                      } transition-all duration-200`}
-                    >
-                      {e}
-                    </div>
-                  ))}
-            </div>
-
-            {trialCount < MAX_TRY && <UnfilledRow trialCount={trialCount} />}
-          </div>
-          <div className="absolute bottom-0 m-2 flex flex-col justify-center items-center gap-1 duration-200">
-            {KEYS.map((keyRow, idx) => (
-              <div key={idx} className="flex gap-x-1">
-                {idx === 2 && (
-                  <button
-                    className="bg-zinc-500 w-16 h-14 rounded-md text-white"
-                    onClick={() => enterPress()}
-                  >
-                    ENTER
-                  </button>
-                )}
-                {keyRow.split("").map((char, i) => (
-                  <button
-                    key={char}
-                    className={`${
-                      BG_COLORS[keyState[char]]
-                    } w-10 h-14 rounded-md text-white`}
-                    onClick={() => alphaPress(char)}
-                  >
-                    {char}
-                  </button>
-                ))}
-                {idx === 2 && (
-                  <button
-                    className="bg-zinc-500 w-16 h-14 rounded-md text-white"
-                    onClick={() => backspacePress()}
-                  >
-                    <FontAwesomeIcon fixedWidth icon={faBackspace} />
-                  </button>
-                )}
+              <div
+                className={`flex w-fit gap-x-1 duration-200 ${
+                  shake ? "animate-shake" : "animate-none"
+                }`}
+              >
+                {trialCount <= MAX_TRY &&
+                  currentWord
+                    .padEnd(MAX_LENGTH)
+                    .split("")
+                    .map((e, idx) => (
+                      <div
+                        key={idx}
+                        className={`box-border h-14 w-14 border-2 bg-white dark:bg-zinc-900 sm:h-16 sm:w-16 ${
+                          e !== " " ? "border-zinc-500" : "border-zinc-600"
+                        } flex select-none items-center justify-center text-center text-3xl font-bold dark:text-white ${
+                          keyIn && e !== " " && idx === currentWord.length - 1
+                            ? "scale-110"
+                            : "scale-100"
+                        } transition-all duration-200`}
+                      >
+                        {e}
+                      </div>
+                    ))}
               </div>
-            ))}
+
+              {trialCount < MAX_TRY && <UnfilledRow trialCount={trialCount} />}
+            </div>
+            <div className="w-fit m-2 flex flex-col items-center justify-center gap-1 duration-200">
+              {KEYS.map((keyRow, idx) => (
+                <div key={idx} className="flex gap-x-1">
+                  {idx === 2 && (
+                    <button
+                      className="h-10 w-12 rounded-md bg-zinc-500 text-xs text-white sm:h-14 sm:w-16 sm:text-base"
+                      onClick={() => enterPress()}
+                    >
+                      ENTER
+                    </button>
+                  )}
+                  {keyRow.split("").map((char, i) => (
+                    <button
+                      key={char}
+                      className={`${
+                        BG_COLORS[keyState[char]]
+                      } h-10 w-8 rounded-md text-white sm:h-14 sm:w-10 sm:text-base`}
+                      onClick={() => alphaPress(char)}
+                    >
+                      {char}
+                    </button>
+                  ))}
+                  {idx === 2 && (
+                    <button
+                      className="h-10 w-12 rounded-md bg-zinc-500 text-white sm:h-14 sm:w-16 sm:text-base"
+                      onClick={() => backspacePress()}
+                    >
+                      <FontAwesomeIcon fixedWidth icon={faBackspace} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
           <Modal
             condition={win}
@@ -316,13 +318,13 @@ function Wordle() {
             showCloseBtn={false}
             closeBtnMsg=""
           >
-            <div className="text-center h-fit dark:text-white py-4 px-2">
+            <div className="h-fit py-4 px-2 text-center dark:text-white">
               <p>
                 Round {round} ({trialCount > MAX_TRY ? "X" : trialCount - 1}/
                 {MAX_TRY})
               </p>
               <div className="my-2">
-                <p className="text-pink-500 font-bold text-2xl">
+                <p className="text-2xl font-bold text-pink-500">
                   {result.word}
                 </p>
                 <p>{result.definition}</p>

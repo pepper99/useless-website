@@ -24,7 +24,7 @@ function Layout({ children, backButton }) {
         {children}
         {mounted && (
           <OvalButton
-            className="absolute sm:bottom-[5%] sm:right-[5%] sm:top-auto sm:left-auto top-[10%] left-[5%]"
+            className="absolute sm:bottom-[5%] sm:right-[5%] sm:top-auto sm:left-auto top-[5%] right-[5%]"
             onClick={darkMode.toggle}
           >
             <FontAwesomeIcon icon={darkMode.value ? faMoon : faSun} />
