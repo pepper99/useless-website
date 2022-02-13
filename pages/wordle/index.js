@@ -227,6 +227,8 @@ function Wordle() {
     }
   }, []);
 
+  // console.log(trialCount > MAX_TRY && !win, trialCount, MAX_TRY, win);
+
   return (
     <Layout backButton>
       <Head>
@@ -321,7 +323,7 @@ function Wordle() {
           >
             <div className="h-fit py-4 px-2 text-center dark:text-white">
               <p>
-                Round {round} ({trialCount > MAX_TRY ? "X" : trialCount - 1}/
+                Round {round} ({(trialCount > MAX_TRY) && !win ? "X" : trialCount - 1}/
                 {MAX_TRY})
               </p>
               <div className="my-2">
