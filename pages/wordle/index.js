@@ -6,6 +6,8 @@ import toast, { Toaster } from "react-hot-toast";
 import Layout from "../../components/Layout";
 import Modal from "../../components/Modal";
 import useMounted from "../../hooks/useMounted";
+import { getRound } from "../api/wordle/get_round";
+import { getWord } from "../api/wordle/get_word";
 
 const KEYS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 const MAX_LENGTH = 6;
@@ -57,7 +59,7 @@ function UnfilledRow({ trialCount }) {
   ));
 }
 
-function Wordle() {
+function Wordle({ round, word, definition }) {
   var gameState = { trialCount: 1, wordHistory: [], keyState: keyInitState };
   if (typeof window !== "undefined") {
     const saveState = JSON.parse(localStorage.getItem("pepper-wordle"));
@@ -65,11 +67,9 @@ function Wordle() {
   }
   const [currentWord, setCurrentWord] = useState("");
   const [win, setWin] = useState(gameState.win || false);
-  const [round, setRound] = useState(gameState.round || 1);
   const [trialCount, setTrialCount] = useState(gameState.trialCount || 1);
   const [wordHistory, setWordHistory] = useState(gameState.wordHistory || []);
   const [keyState, setKeyState] = useState(gameState.keyState || keyInitState);
-  const [result, setResult] = useState({ word: "", definition: "" });
   const mounted = useMounted();
 
   const [shake, setShake] = useState(false);
@@ -125,8 +125,6 @@ function Wordle() {
 
     setKeyboard(currentWord, data.status);
 
-    // console.log(data);
-
     const newWordHistory = [
       ...wordHistory,
       { word: currentWord, status: data.status },
@@ -180,7 +178,26 @@ function Wordle() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [trialCount, currentWord, wordHistory, win, round]);
+  }, [trialCount, currentWord, wordHistory, win]);
+
+  useEffect(async () => {
+    const gameState = JSON.parse(localStorage.getItem("pepper-wordle"));
+    // console.log(gameState);
+    if (gameState === null) return;
+    
+    if (gameState.round !== round) {
+      setTrialCount(1);
+      setWordHistory([]);
+      setKeyState(keyInitState);
+      setWin(false);
+      localStorage.removeItem("pepper-wordle");
+    } else {
+      setTrialCount(gameState.trialCount);
+      setWordHistory(gameState.wordHistory);
+      setKeyState(gameState.keyState);
+      setWin(gameState.win);
+    }
+  }, []);
 
   useEffect(async () => {
     const newState = JSON.stringify({
@@ -191,41 +208,7 @@ function Wordle() {
       round: round,
     });
     localStorage.setItem("pepper-wordle", newState);
-    if (win || trialCount > MAX_TRY) {
-      console.log(trialCount);
-      const res = await fetch("/api/wordle/get_word");
-      const data = await res.json();
-      console.log(data);
-      setResult({
-        word: data.word,
-        definition: data.definition,
-      });
-    }
-  }, [wordHistory, trialCount, keyState, win, round]);
-
-  useEffect(async () => {
-    const gameState = JSON.parse(localStorage.getItem("pepper-wordle"));
-    // console.log(gameState);
-    if (gameState === null) return;
-
-    const res = await fetch(`/api/wordle/get_round`);
-    const data = await res.json();
-    console.log(data);
-    if (gameState.round !== data.round) {
-      localStorage.removeItem("pepper-wordle");
-      setTrialCount(1);
-      setWordHistory([]);
-      setKeyState(keyInitState);
-      setWin(false);
-      setRound(data.round);
-    } else {
-      setTrialCount(gameState.trialCount);
-      setWordHistory(gameState.wordHistory);
-      setKeyState(gameState.keyState);
-      setWin(gameState.win);
-      setRound(gameState.round);
-    }
-  }, []);
+  }, [wordHistory, trialCount, keyState, win]);
 
   // console.log(trialCount > MAX_TRY && !win, trialCount, MAX_TRY, win);
 
@@ -242,8 +225,8 @@ function Wordle() {
       </Head>
       {mounted && (
         <>
-          <div className="m-auto flex flex-col justify-between items-center h-full min-h-fit w-fit">
-            <div className="my-auto w-fit flex flex-col gap-y-1 transition-transform">
+          <div className="m-auto flex h-full min-h-fit w-fit flex-col items-center justify-between">
+            <div className="my-auto flex w-fit flex-col gap-y-1 transition-transform">
               {wordHistory.map((hist, idx) => (
                 <FilledRow
                   key={idx}
@@ -280,7 +263,7 @@ function Wordle() {
 
               {trialCount < MAX_TRY && <UnfilledRow trialCount={trialCount} />}
             </div>
-            <div className="w-fit m-2 flex flex-col items-center justify-center gap-1 duration-200">
+            <div className="m-2 flex w-fit flex-col items-center justify-center gap-1 duration-200">
               {KEYS.map((keyRow, idx) => (
                 <div key={idx} className="flex gap-x-1">
                   {idx === 2 && (
@@ -323,14 +306,14 @@ function Wordle() {
           >
             <div className="h-fit py-4 px-2 text-center dark:text-white">
               <p>
-                Round {round} ({(trialCount > MAX_TRY) && !win ? "X" : trialCount - 1}/
-                {MAX_TRY})
+                Round {round} (
+                {trialCount > MAX_TRY && !win ? "X" : trialCount - 1}/{MAX_TRY})
               </p>
               <div className="my-2">
                 <p className="text-2xl font-bold text-pink-500">
-                  {result.word}
+                  {word}
                 </p>
-                <p>{result.definition}</p>
+                <p>{definition}</p>
               </div>
             </div>
           </Modal>
@@ -339,6 +322,18 @@ function Wordle() {
       <Toaster />
     </Layout>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { word, definition } = await getWord();
+  const round = await getRound();
+  return {
+    props: {
+      round: round,
+      word: word,
+      definition: definition,
+    },
+  };
 }
 
 export default Wordle;

@@ -1,6 +1,6 @@
 import { supabase } from "../../../utils/supabaseClient";
 
-async function getRound() {
+export async function getRound() {
   const { data, error } = await supabase
     .from("words")
     .select("id", { count: "exact" });
