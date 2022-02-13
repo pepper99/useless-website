@@ -69,7 +69,7 @@ function Wordle() {
   const [trialCount, setTrialCount] = useState(gameState.trialCount || 1);
   const [wordHistory, setWordHistory] = useState(gameState.wordHistory || []);
   const [keyState, setKeyState] = useState(gameState.keyState || keyInitState);
-  const [result, setResult] = useState({});
+  const [result, setResult] = useState({ word: "", definition: "" });
   const mounted = useMounted();
 
   const [shake, setShake] = useState(false);
@@ -141,8 +141,11 @@ function Wordle() {
       setTimeout(() => setScaleOut(false), 250);
     }, 100);
 
-    console.log("win", data.win);
-    setTimeout(() => setWin(data.win), 1000);
+    const winning = data.win;
+    // console.log("win", winning);
+    // console.log(typeof winning);
+    // setWin(winning);
+    setTimeout(() => setWin(winning), 1000);
   }
 
   function backspacePress() {
@@ -191,6 +194,7 @@ function Wordle() {
     if (win) {
       const res = await fetch("/api/wordle/get_word");
       const data = await res.json();
+      console.log(data);
       setResult({
         word: data.word,
         definition: data.definition,
@@ -318,7 +322,9 @@ function Wordle() {
                 {MAX_TRY})
               </p>
               <div className="my-2">
-                <p className="text-pink-500 font-bold text-2xl">{result.word}</p>
+                <p className="text-pink-500 font-bold text-2xl">
+                  {result.word}
+                </p>
                 <p>{result.definition}</p>
               </div>
             </div>

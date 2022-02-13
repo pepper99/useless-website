@@ -3,10 +3,11 @@ import { getWord, WORD_LENGTH } from "../get_word";
 const fs = require("fs").promises;
 
 async function checkExistence(word, validWord) {
+  console.log("validWord", validWord);
   if (word === validWord) return true;
 
-  const fileDir = 'data/dictionary.json';
-  const dir = path.resolve('./public', fileDir);
+  const fileDir = "data/dictionary.json";
+  const dir = path.resolve("./public", fileDir);
 
   const data = await fs.readFile(dir, "utf-8");
   const jsonObj = JSON.parse(data);
@@ -48,15 +49,17 @@ function checkCorrectness(word, validWord) {
 export default async function handler(req, res) {
   try {
     const word = req.query.word;
-    const validWord = getWord().word;
-    console.log("validWord", validWord);
+    const validWord = (await getWord()).word;
     if (!(await checkExistence(word, validWord)))
       return res.status(200).json({ success: true, isExist: false });
 
     console.log(word);
 
     const { status, win } = checkCorrectness(word, validWord);
-    res.status(200).json({ success: true, isExist: true, status: status, win: win });
+    console.log(win);
+    res
+      .status(200)
+      .json({ success: true, isExist: true, status: status, win: win });
   } catch (error) {
     console.log(Object.keys(error.keys));
     res.status(400).json({ success: false, err: error });

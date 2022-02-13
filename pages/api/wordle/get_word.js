@@ -1,16 +1,24 @@
+import { supabase } from "../../../utils/supabaseClient";
 import path from "path";
 
 const fs = require("fs").promises;
 
-export const words = [{ word: "WORDLE", definition: "A game of vocabulary." }];
 export const WORD_LENGTH = 6;
 
-export function getWord() {
-  return words[words.length - 1];
+export async function getWord() {
+  const { data, error } = await supabase
+    .from("words")
+    .select("word,definition")
+    .order("id", { ascending: false })
+    .limit(1);
+  return data[0];
 }
 
-export function getRound() {
-  return words.length;
+export async function getRound() {
+  const { data, error } = await supabase
+    .from("words")
+    .select("id", { count: "exact" });
+  return data.length;
 }
 
 function getRandomInt(min, max) {
@@ -20,8 +28,8 @@ function getRandomInt(min, max) {
 }
 
 async function getRandomWord() {
-  const fileDir = 'data/dictionary.json';
-  const dir = path.resolve('./public', fileDir);
+  const fileDir = "data/dictionary.json";
+  const dir = path.resolve("./public", fileDir);
 
   const data = await fs.readFile(dir, "utf-8");
   const jsonObj = JSON.parse(data);
@@ -34,21 +42,29 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     if (req.body.word.length === WORD_LENGTH) {
       const word = req.body.word;
-      words.push({ word: word, definition: req.body.definition });
+      const definition = req.body.definition;
+
+      const { data, error } = await supabase.from("words").insert({
+        word: word,
+        definition: definition,
+      });
+
       return res.status(200).json({
-        word: getWord(),
-        definition: req.body.definition,
-        words: words,
+        word: word,
+        definition: definition,
       });
     } else {
-      const data = await getRandomWord();
-      words.push({ word: data.word, definition: data.definition });
-      return res
-        .status(200)
-        .json({ word: getWord(), definition: "", words: words });
+      const { word, definition } = await getRandomWord();
+
+      const { data, error } = await supabase.from("words").insert({
+        word: word,
+        definition: definition,
+      });
+
+      return res.status(200).json({ word: word, definition: definition });
     }
   } else {
-    const { word, definition } = getWord();
-    res.status(200).json({ word: word, definition: definition, words: words });
+    const { word, definition } = await getWord();
+    res.status(200).json({ word: word, definition: definition });
   }
 }
