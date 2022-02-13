@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Layout from "../../components/Layout";
-import pageTransition from "../../HOC/pageTransition";
 
 function Fact({ fact, source }) {
 
