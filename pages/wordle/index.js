@@ -1,4 +1,4 @@
-import { faBackspace } from "@fortawesome/free-solid-svg-icons";
+import { faBackspace, faShare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
@@ -18,6 +18,12 @@ const BG_COLORS = {
   misplaced: "bg-[#b59f3b]",
   wrong: "bg-zinc-700",
   none: "bg-zinc-500",
+};
+
+const EMOJIS = {
+  valid: "🟩",
+  misplaced: "🟨",
+  wrong: "⬛",
 };
 
 const keyInitState = {};
@@ -79,6 +85,7 @@ function Wordle({ round, word, definition }) {
   // useEffect(() => console.log(trialCount, currentWord, wordHistory));
 
   function alphaPress(key) {
+    if (win) return;
     if (!/^[A-Z]+$/.test(key)) return;
     if (currentWord.length < MAX_LENGTH) {
       const newWord = currentWord + key;
@@ -110,6 +117,7 @@ function Wordle({ round, word, definition }) {
   }
 
   async function enterPress() {
+    if (win) return;
     if (currentWord.length !== MAX_LENGTH) {
       onError("Not enough letters");
       return;
@@ -147,12 +155,43 @@ function Wordle({ round, word, definition }) {
   }
 
   function backspacePress() {
+    if (win) return;
     // console.log("backspace");
     if (currentWord.length > 0) {
       const newWord = currentWord.slice(0, -1);
       setCurrentWord(newWord);
     }
   }
+
+  useEffect(async () => {
+    const gameState = JSON.parse(localStorage.getItem("pepper-wordle"));
+    // console.log(gameState);
+    if (gameState === null) return;
+
+    if (gameState.round !== round) {
+      setTrialCount(1);
+      setWordHistory([]);
+      setKeyState(keyInitState);
+      setWin(false);
+      localStorage.removeItem("pepper-wordle");
+    } else {
+      setTrialCount(gameState.trialCount);
+      setWordHistory(gameState.wordHistory);
+      setKeyState(gameState.keyState);
+      setWin(gameState.win);
+    }
+  }, []);
+
+  useEffect(async () => {
+    const newState = JSON.stringify({
+      wordHistory: wordHistory,
+      trialCount: trialCount,
+      keyState: keyState,
+      win: win,
+      round: round,
+    });
+    localStorage.setItem("pepper-wordle", newState);
+  }, [wordHistory, trialCount, keyState, win]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -180,37 +219,29 @@ function Wordle({ round, word, definition }) {
     };
   }, [trialCount, currentWord, wordHistory, win]);
 
-  useEffect(async () => {
-    const gameState = JSON.parse(localStorage.getItem("pepper-wordle"));
-    // console.log(gameState);
-    if (gameState === null) return;
-    
-    if (gameState.round !== round) {
-      setTrialCount(1);
-      setWordHistory([]);
-      setKeyState(keyInitState);
-      setWin(false);
-      localStorage.removeItem("pepper-wordle");
-    } else {
-      setTrialCount(gameState.trialCount);
-      setWordHistory(gameState.wordHistory);
-      setKeyState(gameState.keyState);
-      setWin(gameState.win);
-    }
-  }, []);
+  // console.log({
+  //   wordHistory: wordHistory,
+  //   trialCount: trialCount,
+  //   keyState: keyState,
+  //   win: win,
+  //   round: round,
+  // });
 
-  useEffect(async () => {
-    const newState = JSON.stringify({
-      wordHistory: wordHistory,
-      trialCount: trialCount,
-      keyState: keyState,
-      win: win,
-      round: round,
+  function resultShare() {
+    var share = `Wordle clone @useless-website\n${round} ${
+      trialCount > MAX_TRY && !win ? "X" : trialCount - 1
+    }/${MAX_TRY}\n\n`;
+    wordHistory.forEach((history) => {
+      history.status.forEach((stat) => (share += EMOJIS[stat]));
+      share += "\n";
     });
-    localStorage.setItem("pepper-wordle", newState);
-  }, [wordHistory, trialCount, keyState, win]);
-
-  // console.log(trialCount > MAX_TRY && !win, trialCount, MAX_TRY, win);
+    navigator.clipboard.writeText(share);
+    toast("Copied to clipboard", {
+      duration: 1000,
+      className: "dark:bg-zinc-800 bg-white dark:text-white text-black",
+    });
+    // console.log(share);
+  }
 
   return (
     <Layout backButton>
@@ -300,7 +331,17 @@ function Wordle({ round, word, definition }) {
           <Modal
             condition={win || trialCount > MAX_TRY}
             initial={true}
-            title="Result"
+            title={
+              <p>
+                {"Result "}
+                <a
+                  className="cursor-pointer transition-colors hover:text-pink-500"
+                  onClick={() => resultShare()}
+                >
+                  <FontAwesomeIcon fixedWidth size="xs" icon={faShare} />
+                </a>
+              </p>
+            }
             showCloseBtn={false}
             closeBtnMsg=""
           >
@@ -310,9 +351,7 @@ function Wordle({ round, word, definition }) {
                 {trialCount > MAX_TRY && !win ? "X" : trialCount - 1}/{MAX_TRY})
               </p>
               <div className="my-2">
-                <p className="text-2xl font-bold text-pink-500">
-                  {word}
-                </p>
+                <p className="text-2xl font-bold text-pink-500">{word}</p>
                 <p>{definition}</p>
               </div>
             </div>
