@@ -1,16 +1,11 @@
-import { supabase } from "../../../../utils/supabaseClient";
-import { getWord, WORD_LENGTH } from "../get_word";
+import dictionary from "../../../public/data/dictionary_compact.json"
+import { WORD_LENGTH } from "./get_word";
 
 async function checkExistence(word, validWord) {
   console.log("validWord", validWord);
   if (word === validWord) return true;
 
-  const { data, error } = await supabase
-    .from("dict")
-    .select()
-    .textSearch("fts", word);
-
-  return data.length > 0;
+  return word in dictionary;
 }
 
 function checkCorrectness(word, validWord) {
@@ -41,8 +36,10 @@ function checkCorrectness(word, validWord) {
 
 export default async function handler(req, res) {
   try {
-    const word = req.query.word;
-    const validWord = (await getWord()).word;
+    const body = JSON.parse(req.body);
+    const word = body.word;
+    const validWord = body.validWord;
+    
     if (!(await checkExistence(word, validWord)))
       return res.status(200).json({ success: true, isExist: false });
 

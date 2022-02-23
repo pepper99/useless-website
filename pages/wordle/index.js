@@ -65,7 +65,7 @@ function UnfilledRow({ trialCount }) {
   ));
 }
 
-function Wordle({ round, word, definition }) {
+function Wordle({ round, validWord, definition }) {
   var gameState = { trialCount: 1, wordHistory: [], keyState: keyInitState };
   if (typeof window !== "undefined") {
     const saveState = JSON.parse(localStorage.getItem("pepper-wordle"));
@@ -123,7 +123,15 @@ function Wordle({ round, word, definition }) {
       return;
     }
 
-    const res = await fetch(`/api/wordle/check_word/${currentWord}`);
+    const res = await fetch(`/api/wordle/check_word`, {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'same-origin',      
+      body: JSON.stringify({
+        word: currentWord,
+        validWord: validWord
+      })
+    });
     const data = await res.json();
 
     if (!data.isExist) {
@@ -351,7 +359,7 @@ function Wordle({ round, word, definition }) {
                 {trialCount > MAX_TRY && !win ? "X" : trialCount - 1}/{MAX_TRY})
               </p>
               <div className="my-2">
-                <p className="text-2xl font-bold text-pink-500">{word}</p>
+                <p className="text-2xl font-bold text-pink-500">{validWord}</p>
                 <p>{definition}</p>
               </div>
             </div>
@@ -364,13 +372,13 @@ function Wordle({ round, word, definition }) {
 }
 
 export async function getServerSideProps(context) {
-  const { word, definition } = await getWord();
-  const round = await getRound();
+  const { word, definition, id } = await getWord();
+
   return {
     props: {
-      round: round,
-      word: word,
+      validWord: word,
       definition: definition,
+      round: id,
     },
   };
 }

@@ -3,7 +3,7 @@ import { supabase } from "../../../utils/supabaseClient";
 export async function getRound() {
   const { data, error } = await supabase
     .from("words")
-    .select("id", { count: "exact" });
+    .select("*", { count: "exact" });
   return data.length;
 }
 
